@@ -31,7 +31,7 @@ public class Message implements MsgPackSerializable {
             packer.packString(id.toString());
             packer.packString(message);
         } catch (IOException ex) {
-            log.info("Error in write date method:\n{}", ex.getMessage());
+            log.info("Error in write data method:\n{}", ex.getMessage());
         }
     }
 
@@ -39,6 +39,7 @@ public class Message implements MsgPackSerializable {
     public void readData(MessageUnpacker unpacker) {
         try {
             this.id = unpacker.unpackLong();
+//            this.id = 1L;
             this.message = unpacker.unpackString();
         } catch (IOException ex) {
             log.info("Error in read data method:\n{}", ex.getMessage());

@@ -11,8 +11,4 @@ public interface MessageService {
     Mono<Message> handle(Message message);
 
     void generate() throws JsonProcessingException, InterruptedException;
-
-    Message extractMessage(byte[] body);
-
-    byte[] writeDataToMsgpack(Message message);
 }

@@ -19,6 +19,7 @@ import ru.tsc.kafkaproducer.dto.Message;
 import ru.tsc.kafkaproducer.producer.KafkaProducer;
 import ru.tsc.kafkaproducer.service.MessageService;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -47,23 +48,6 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public Message extractMessage(byte[] body) {
-        try {
-            return new Message(body);
-        } catch (MessagePackException ex) {
-            log.info("Error in extract message method:\n{}", ex.getMessage());
-            throw new MessagePackException();
-        }
-    }
-
-    @Override
-    public byte[] writeDataToMsgpack(Message message) {
-        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
-        message.writeData(packer);
-        return packer.toByteArray();
-    }
-
-    @Override
     @Async
     public void generate() throws JsonProcessingException, InterruptedException {
         for (long i = 1; i <= 1000; i++) {
@@ -73,11 +57,33 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
+    private Message extractMessage(byte[] body) {
+        try {
+            return new Message(body);
+        } catch (MessagePackException ex) {
+            log.info("Error in extract message method:\n{}", ex.getMessage());
+            throw new MessagePackException();
+        }
+    }
+
     private void process(Message message) {
         log.info("Handle message: {}", message);
         byte [] body = writeDataToMsgpack(message);
         messageMap.put(message.getId(), body);
         producer.send(message, body);
+    }
+
+    private byte[] writeDataToMsgpack(Message message) {
+        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
+        try {
+            packer.packLong(message.getId());
+            packer.packString(message.getMessage());
+        } catch (IOException ex) {
+            log.info("Error while write to msgpack: {}", ex.getMessage());
+        }
+        byte[] body = packer.toByteArray();
+        packer.clear();
+        return body;
     }
 
     private void generatePostRequests(Message message) throws JsonProcessingException {
