@@ -24,7 +24,15 @@ public class MessageController {
     private final MessageService messageService;
     private final OkResponse okResponse = new OkResponse();
 
-    @PostMapping(path = "/messages",
+    @PostMapping("/messages")
+    public Mono<ResponseEntity<byte[]>> handleMessage(@RequestBody Message message) {
+        return messageService.handle(message)
+                .onErrorMap(ex -> new IllegalArgumentException(ex.getMessage()))
+                .map(response -> ResponseEntity.ok(okResponse.toMsgPack()))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    @PostMapping(path = "/messages/msgpack",
             consumes = MediaType.APPLICATION_OCTET_STREAM_VALUE,
             produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public Mono<ResponseEntity<byte[]>> handleMessage(@RequestBody byte[] body) {
