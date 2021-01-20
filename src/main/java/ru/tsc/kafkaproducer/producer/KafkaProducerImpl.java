@@ -27,7 +27,7 @@ public class KafkaProducerImpl implements KafkaProducer {
         message.writeData(packer);
         kafkaProducerTemplate.send(topic, packer.toByteArray())
         .subscribe(senderResult -> {
-            RecordMetadata metadata =senderResult.recordMetadata();
+            RecordMetadata metadata = senderResult.recordMetadata();
             log.info("Send message {} with id {} to topic {}, partition {}, offset {}, timestamp {}",
                     packer.toByteArray(), message.getId(), metadata.topic(), metadata.partition(), metadata.offset(), LocalDateTime.now());
         });
