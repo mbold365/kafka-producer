@@ -47,31 +47,37 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
+    public Message extractMessage(byte[] body) {
+        try {
+            return new Message(body);
+        } catch (MessagePackException ex) {
+            log.info("Error in extract message method:\n{}", ex.getMessage());
+            throw new MessagePackException();
+        }
+    }
+
+    @Override
+    public byte[] writeDataToMsgpack(Message message) {
+        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
+        message.writeData(packer);
+        return packer.toByteArray();
+    }
+
+    @Override
     @Async
-    public Mono<Message> generate() throws JsonProcessingException, InterruptedException {
+    public void generate() throws JsonProcessingException, InterruptedException {
         for (long i = 1; i <= 1000; i++) {
             String messageBody = UUID.randomUUID().toString();
             generatePostRequests(new Message(i, messageBody));
             Thread.sleep(5000);
         }
-        return Mono.just(new Message());
-    }
-
-    private Message extractMessage(byte[] body) {
-        try {
-            return new Message(body);
-        } catch (MessagePackException ex) {
-            log.info("Error in extract message method:\n{}", ex.getMessage());
-            throw new RuntimeException();
-        }
     }
 
     private void process(Message message) {
         log.info("Handle message: {}", message);
-        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
-        message.writeData(packer);
-        messageMap.put(message.getId(), packer.toByteArray());
-        producer.send(message);
+        byte [] body = writeDataToMsgpack(message);
+        messageMap.put(message.getId(), body);
+        producer.send(message, body);
     }
 
     private void generatePostRequests(Message message) throws JsonProcessingException {
