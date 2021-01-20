@@ -10,13 +10,12 @@ import org.msgpack.core.MessageUnpacker;
 import ru.tsc.kafkaproducer.msgpack.MsgPackSerializable;
 
 import java.io.IOException;
-import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class Message implements Serializable, MsgPackSerializable {
+public class Message implements MsgPackSerializable {
 
     private Long id;
 
