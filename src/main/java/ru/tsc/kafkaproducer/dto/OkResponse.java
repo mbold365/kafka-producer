@@ -17,10 +17,6 @@ public class OkResponse implements MsgPackSerializable {
 
     private String status = "RECEIVED";
 
-    public OkResponse(byte[] body) {
-        this.readData(MessagePack.newDefaultUnpacker(body));
-    }
-
     @Override
     public void writeData(MessageBufferPacker packer) {
         try {
