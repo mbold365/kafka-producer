@@ -1,14 +1,12 @@
 package ru.tsc.kafkaproducer.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import ru.tsc.kafkaproducer.dto.Message;
@@ -42,9 +40,9 @@ public class MessageController {
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
-    @PostMapping(path = "test")
-    public Mono<ResponseEntity<Message>> handleMessage(@RequestBody Message message) {
-        messageService.handle(message);
+    @GetMapping("/messages/generators")
+    public Mono<ResponseEntity<Message>> generateMessages() throws JsonProcessingException, InterruptedException {
+        messageService.generate();
         return Mono.just(new ResponseEntity<>(HttpStatus.OK));
     }
 }
