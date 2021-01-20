@@ -1,5 +1,6 @@
 package ru.tsc.kafkaproducer.dto;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
 @Slf4j
 public class Message implements Serializable, MsgPackSerializable {
 
