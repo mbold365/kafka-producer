@@ -7,6 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.msgpack.core.MessageBufferPacker;
 import org.msgpack.core.MessagePack;
 import org.msgpack.core.MessageUnpacker;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 import ru.tsc.kafkaproducer.msgpack.MsgPackSerializable;
 
 import java.io.IOException;
@@ -15,10 +20,13 @@ import java.io.IOException;
 @NoArgsConstructor
 @AllArgsConstructor
 @Slf4j
-public class Message implements MsgPackSerializable {
+@Table("messages")
+public class Message implements MsgPackSerializable, Persistable<Long> {
 
+    @Id
     private Long id;
 
+    @Column
     private String message;
 
     public Message(byte[] body) {
@@ -28,7 +36,7 @@ public class Message implements MsgPackSerializable {
     @Override
     public void writeData(MessageBufferPacker packer) {
         try {
-            packer.packString(id.toString());
+            packer.packLong(id);
             packer.packString(message);
         } catch (IOException ex) {
             log.info("Error in write data method:\n{}", ex.getMessage());
@@ -39,10 +47,16 @@ public class Message implements MsgPackSerializable {
     public void readData(MessageUnpacker unpacker) {
         try {
             this.id = unpacker.unpackLong();
-//            this.id = 1L;
             this.message = unpacker.unpackString();
+            log.info("Successfully deserialized message with id: {} and body: {}", this.id, this.message);
         } catch (IOException ex) {
             log.info("Error in read data method:\n{}", ex.getMessage());
         }
+    }
+
+    @Override
+    @Transient
+    public boolean isNew() {
+        return id == null;
     }
 }
