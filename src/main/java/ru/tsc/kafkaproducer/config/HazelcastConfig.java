@@ -21,7 +21,6 @@ public class HazelcastConfig {
     @Bean
     CacheManager cacheManage(@Qualifier(HC_INSTANCE_BEAN_NAME) HazelcastInstance hcInstance) {
         return new HazelcastCacheManager(hcInstance);
-
     }
 
     @Bean(HC_INSTANCE_BEAN_NAME)
