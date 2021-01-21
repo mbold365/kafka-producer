@@ -38,8 +38,9 @@ public class Message implements MsgPackSerializable, Persistable<Long> {
         try {
             packer.packLong(id);
             packer.packString(message);
+            log.info("Successfully serialized message with id: {}", this.id);
         } catch (IOException ex) {
-            log.info("Error in write data method:\n{}", ex.getMessage());
+            log.info("Error while writing data to msgpack:\n{}", ex.getMessage());
         }
     }
 
@@ -50,7 +51,7 @@ public class Message implements MsgPackSerializable, Persistable<Long> {
             this.message = unpacker.unpackString();
             log.info("Successfully deserialized message with id: {} and body: {}", this.id, this.message);
         } catch (IOException ex) {
-            log.info("Error in read data method:\n{}", ex.getMessage());
+            log.info("Error while reading data to msgpack:\n{}", ex.getMessage());
         }
     }
 

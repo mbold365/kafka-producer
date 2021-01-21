@@ -22,7 +22,7 @@ public class OkResponse implements MsgPackSerializable {
         try {
             packer.packString(this.status);
         } catch (IOException ex) {
-            log.info("Error in write data method in ok response:\n{}", ex.getMessage());
+            log.info("Error while writing OK response to msgpack:\n{}", ex.getMessage());
         }
     }
 
@@ -31,7 +31,7 @@ public class OkResponse implements MsgPackSerializable {
         try {
             this.status = unpacker.unpackString();
         } catch (IOException ex) {
-            log.info("Error in read data method of ok response:\n{}", ex.getMessage());
+            log.info("Error while reading OK response to msgpack:\n{}", ex.getMessage());
         }
     }
 
