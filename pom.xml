@@ -18,10 +18,18 @@
         <java.version>11</java.version>
         <msgpack.version>0.8.21</msgpack.version>
         <hazelcast.version>4.1</hazelcast.version>
+        <swagger.version>3.0.0</swagger.version>
+        <jdbc.version>5.2.12.RELEASE</jdbc.version>
+        <r2dbc.h2.version>0.8.1.RELEASE</r2dbc.h2.version>
+        <springdoc.version>1.5.2</springdoc.version>
     </properties>
 
     <dependencies>
-        <!--  r2dbc  -->
+        <!--  webflux  -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-r2dbc</artifactId>
@@ -29,13 +37,7 @@
         <dependency>
             <groupId>io.r2dbc</groupId>
             <artifactId>r2dbc-h2</artifactId>
-            <scope>runtime</scope>
-        </dependency>
-
-        <!--  webflux  -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-webflux</artifactId>
+            <version>${r2dbc.h2.version}</version>
         </dependency>
         <dependency>
             <groupId>io.projectreactor</groupId>
@@ -70,16 +72,40 @@
             <version>${hazelcast.version}</version>
         </dependency>
 
-        <!--  common  -->
+        <!--  SQL  -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>runtime</scope>
         </dependency>
         <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-core</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${jdbc.version}</version>
         </dependency>
+
+        <!--  swagger  -->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-spring-webflux</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>${swagger.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-webflux-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <!--  common  -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
