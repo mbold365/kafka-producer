@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.msgpack.core.MessageBufferPacker;
 import org.msgpack.core.MessagePack;
-import org.msgpack.core.MessagePackException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -19,7 +18,6 @@ import ru.tsc.kafkaproducer.dto.Message;
 import ru.tsc.kafkaproducer.producer.KafkaProducer;
 import ru.tsc.kafkaproducer.service.MessageService;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -32,13 +30,6 @@ public class MessageServiceImpl implements MessageService {
     private final RestTemplate restTemplate;
     private final ObjectWriter objectWriter;
     private final IMap<Long, byte[]> messageMap;
-
-    @Override
-    public Mono<Message> handle(byte[] body) {
-        return Mono.just(extractMessage(body))
-                .doOnNext(this::process)
-                .onErrorResume(ex -> Mono.error(new IllegalArgumentException()));
-    }
 
     @Override
     public Mono<Message> handle(Message message) {
@@ -57,33 +48,13 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-    private Message extractMessage(byte[] body) {
-        try {
-            return new Message(body);
-        } catch (MessagePackException ex) {
-            log.info("Error in extract message method:\n{}", ex.getMessage());
-            throw new MessagePackException();
-        }
-    }
-
     private void process(Message message) {
         log.info("Handle message: {}", message);
-        byte [] body = writeDataToMsgpack(message);
+        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
+        message.writeData(packer);
+        byte[] body = packer.toByteArray();
         messageMap.put(message.getId(), body);
         producer.send(message, body);
-    }
-
-    private byte[] writeDataToMsgpack(Message message) {
-        MessageBufferPacker packer = MessagePack.newDefaultBufferPacker();
-        try {
-            packer.packLong(message.getId());
-            packer.packString(message.getMessage());
-        } catch (IOException ex) {
-            log.info("Error while write to msgpack: {}", ex.getMessage());
-        }
-        byte[] body = packer.toByteArray();
-        packer.clear();
-        return body;
     }
 
     private void generatePostRequests(Message message) throws JsonProcessingException {
