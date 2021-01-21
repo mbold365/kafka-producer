@@ -6,8 +6,6 @@ import ru.tsc.kafkaproducer.dto.Message;
 
 public interface MessageService {
 
-    Mono<Message> handle(byte[] body);
-
     Mono<Message> handle(Message message);
 
     void generate() throws JsonProcessingException, InterruptedException;
